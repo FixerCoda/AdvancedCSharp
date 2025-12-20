@@ -2,11 +2,31 @@ using System;
 
 namespace BasicDelegates
 {
+    class Character
+    {
+        public string Name { get; set; } = "Unknown";
+        public int Health { get; set; } = 100;
+    }
+
+    class Player : Character
+    {
+        public int Score { get; set; } = 0;
+    }
+
+    class Enemy : Character
+    {
+        public int RewardPoints { get; set; } = 50;
+    }
+
     class Program
     {
         delegate void GameAction(string playerName);
         delegate int DamageCalculator(int baseDamage);
         delegate void PowerUpEffect(string effectName);
+
+        delegate Player PlayerFactory(string name);
+        delegate void CharacterHandler(Character character);
+
 
         static void Main(string[] args)
         {
@@ -79,6 +99,26 @@ namespace BasicDelegates
             int baseScore = 500;
             int finalScore = applyPenalty(multiplyCombo(addBonus(baseScore)));
             Console.WriteLine($"Base Score: {baseScore} -> Final Score: {finalScore}");
+
+            // Covariance: delegate can return a more derived type where a less derived type is expected
+            Console.WriteLine("\nExample 9: Covariance - Return type compatibility");
+            PlayerFactory factory = CreatePlayer;
+            Player player = factory("Hero");
+            Console.WriteLine($"Created player: {player.Name} with {player.Health} HP and {player.Score} score");
+
+            Func<Character> createCharacter = CreateDefaultPlayer; // Expected: Character, Received: Player
+            Character character = createCharacter();
+            Console.WriteLine($"Character created: {character.Name}");
+
+            // Contravariance: delegate can accept a more general parameter type
+            Console.WriteLine("\nExample 10: Contravariance - Parameter type compatibility");
+            CharacterHandler handler = DisplayCharacterInfo; // Parameter expected: Character
+
+            Player newPlayer = new Player { Name = "Zelda", Health = 100, Score = 1500 };
+            handler(newPlayer); // Parameter Received: Player
+
+            Action<Character> characterAction = HandleAnyCharacter; // Parameter expected: Character
+            characterAction(newPlayer); // Parameter Received: Player
         }
 
         static void Attack(string playerName)
@@ -119,6 +159,26 @@ namespace BasicDelegates
         static void ShieldActivate(string effectName)
         {
             Console.WriteLine($"[Shield Active] Damage reduction activated! ({effectName})");
+        }
+
+        static Player CreateDefaultPlayer()
+        {
+            return new Player { Name = "Default Player", Health = 100, Score = 0 };
+        }
+
+        static Player CreatePlayer(string name)
+        {
+            return new Player { Name = name, Health = 100, Score = 0 };
+        }
+
+        static void DisplayCharacterInfo(Character character)
+        {
+            Console.WriteLine($"[INFO] {character.Name} - HP: {character.Health}");
+        }
+
+        static void HandleAnyCharacter(Character character)
+        {
+            Console.WriteLine($"[HANDLER] Processing character: {character.Name}");
         }
     }
 }
