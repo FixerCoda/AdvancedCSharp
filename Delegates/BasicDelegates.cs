@@ -33,6 +33,7 @@ namespace BasicDelegates
 
             Console.WriteLine("\nExample 3: Power-Up Collection (Multicast)");
             PowerUpEffect? collectPowerUp = SpeedBoost;
+
             collectPowerUp += StrengthBoost;
             collectPowerUp += ShieldActivate;
 
@@ -44,7 +45,40 @@ namespace BasicDelegates
             Console.WriteLine("Shield expired! Collecting another power-up:");
             collectPowerUp?.Invoke("Health Pack");
 
-            Console.ReadKey();
+            // Func: delegates with multiple inputs and return values
+            Console.WriteLine("\nExample 5: Func<T, TResult> - With return value");
+            Func<int, int, int> calculateDamage = (attack, defense) => Math.Max(0, attack - defense);
+            int damage = calculateDamage(75, 25);
+            Console.WriteLine($"Damage dealt: {damage}");
+
+            Func<string, string> formatPlayerName = (name) => $"{name.ToUpper()}";
+            Console.WriteLine($"Player: {formatPlayerName("Link")}");
+
+            // Action: delegates with multiple inputs and no return value
+            Console.WriteLine("\nExample 6: Action<T> - No return value");
+            Action<string> logMessage = (msg) => Console.WriteLine($"[LOG] {msg}");
+            logMessage("Player entered the dungeon");
+            logMessage("Player found treasure chest");
+
+            // Predicate: delegates with one input that return bool
+            Console.WriteLine("\nExample 7: Predicate<T> - Boolean test");
+            Predicate<int> isHealthCritical = (health) => health < 20;
+            Predicate<int> hasEnoughMana = (mana) => mana >= 50;
+
+            int currentHealth = 15;
+            int currentMana = 60;
+
+            Console.WriteLine($"Health: {currentHealth} - Critical: {isHealthCritical(currentHealth)}");
+            Console.WriteLine($"Mana: {currentMana} - Can cast spell: {hasEnoughMana(currentMana)}");
+
+            Console.WriteLine("\nExample 8: Chaining Func delegates");
+            Func<int, int> addBonus = (score) => score + 100;
+            Func<int, int> multiplyCombo = (score) => score * 2;
+            Func<int, int> applyPenalty = (score) => score - 50;
+
+            int baseScore = 500;
+            int finalScore = applyPenalty(multiplyCombo(addBonus(baseScore)));
+            Console.WriteLine($"Base Score: {baseScore} -> Final Score: {finalScore}");
         }
 
         static void Attack(string playerName)
